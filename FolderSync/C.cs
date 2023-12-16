@@ -1,14 +1,4 @@
-﻿//if (args.Length < 2)
-//{
-//    Console.WriteLine("Syntax: sync Quellverzeichnis Zielverzeichnis [-l] [-d] [-D]");
-//    return;
-//}
-
-
-
-
-
-public class C : IDisposable
+﻿public class C : IDisposable
 {
     private readonly ConsoleColor _foreground, _background;
 

@@ -164,8 +164,3 @@ static void SyncFiles(DirectoryInfo source, DirectoryInfo target, DeleteMode del
         }
     }
 }
-
-enum DeleteMode
-{
-    None, Prompt, Silent
-}
