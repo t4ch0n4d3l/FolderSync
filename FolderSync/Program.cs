@@ -34,15 +34,17 @@ if (args.Length == 3)
     }
 }
 
-SyncFiles(source, target, deleteMode);
+var items = SyncFiles(source, target, deleteMode);
 
-Console.ReadKey();
+Console.WriteLine($"Finished syncing total of {items} files and directories!");
 
-static void SyncFiles(DirectoryInfo source, DirectoryInfo target, DeleteMode deleteMode, string currentPath = null)
+static int SyncFiles(DirectoryInfo source, DirectoryInfo target, DeleteMode deleteMode, string? currentPath = null)
 {
+    var result = 0;
     currentPath ??= string.Empty;
     foreach (var sourceFile in source.GetFiles())
     {
+        result++;
         var targetFile = new FileInfo(Path.Combine(target.FullName, sourceFile.Name));
         var path = Path.Combine(currentPath, sourceFile.Name);
         if (!targetFile.Exists)
@@ -58,11 +60,11 @@ static void SyncFiles(DirectoryInfo source, DirectoryInfo target, DeleteMode del
         {
             if (targetFile.LastWriteTimeUtc > sourceFile.LastWriteTimeUtc)
             {
-                var color = Console.ForegroundColor;
                 using (C.Color(ConsoleColor.Black, ConsoleColor.Red))
                 {
-                    Console.WriteLine($"Warning! File is newer in target than in source: ");
+                    Console.Write($"Warning! File is newer in target than in source: ");
                 }
+                Console.WriteLine();
             }
             using (C.Color(ConsoleColor.Black, ConsoleColor.Yellow))
             {
@@ -77,6 +79,7 @@ static void SyncFiles(DirectoryInfo source, DirectoryInfo target, DeleteMode del
     {
         foreach (var targetFile in target.GetFiles())
         {
+            result++;
             var sourceFile = new FileInfo(Path.Combine(source.FullName, targetFile.Name));
             var path = Path.Combine(currentPath, targetFile.Name);
             if (!sourceFile.Exists)
@@ -115,19 +118,26 @@ static void SyncFiles(DirectoryInfo source, DirectoryInfo target, DeleteMode del
 
     foreach (var sourceDirectory in source.GetDirectories())
     {
+        result++;
         var targetDirectory = new DirectoryInfo(Path.Combine(target.FullName, sourceDirectory.Name));
         var path = Path.Combine(currentPath, sourceDirectory.Name);
         if (!targetDirectory.Exists)
         {
+            using (C.Color(ConsoleColor.Black, ConsoleColor.Green))
+            {
+                Console.Write(" + ");
+            }
+            Console.WriteLine(path);
             targetDirectory.Create();
         }
-        SyncFiles(sourceDirectory, targetDirectory, deleteMode, path);
+        result += SyncFiles(sourceDirectory, targetDirectory, deleteMode, path);
     }
 
     if (deleteMode != DeleteMode.None)
     {
         foreach (var targetDirectory in target.GetDirectories())
         {
+            result++;
             var sourceDirectory = new DirectoryInfo(Path.Combine(source.FullName, targetDirectory.Name));
             var path = Path.Combine(currentPath, targetDirectory.Name);
             if (!sourceDirectory.Exists)
@@ -163,4 +173,5 @@ static void SyncFiles(DirectoryInfo source, DirectoryInfo target, DeleteMode del
             }
         }
     }
+    return result;
 }
