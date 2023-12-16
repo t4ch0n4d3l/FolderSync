@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Foldersync": {
+      "commandName": "Project",
+      "commandLineArgs": "\"E:\\Eigene Bilder\" \"D:\\Bilder\" -d"
+    }
+  }
+}
